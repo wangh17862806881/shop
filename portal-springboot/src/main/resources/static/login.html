@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆页面</title>
+    <link href="js/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+
+<button onclick="WXpay()">测试支付</button>
+<div id="qrcode">
+
+</div>
+<!--  手机号 验证码登陆  免密登陆  -->
+<div style="width: 300px; margin: auto">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">账号登陆</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">免密登陆</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="home">
+            <!--  用户名 验证码登陆  -->
+            <div style="width: 300px; margin: auto ">
+
+                <form class="form-signin">
+                    <h2 class="form-signin-heading">请登录</h2>
+                    <label  class="sr-only">用户名:</label>
+                    <input type="text" id="userName" class="form-control" placeholder="用户名...." required autofocus>
+                    <label  class="sr-only">密码:</label>
+                    <input type="password" id="password" class="form-control" placeholder="密码...." required>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" value="remember-me"> 记住密码
+                        </label>
+                        <label>
+                            <a href="/verifyUser.jsp">忘记密码</a>
+                        </label>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block" onclick="logincheck()" type="button">登陆</button>
+                </form>
+
+            </div>
+        </div>
+        <!--    -->
+        <div role="tabpanel" class="tab-pane" id="profile">
+
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <div class="input-group" >
+                        <input type="text" class="form-control"  id="phone" placeholder="Search for...">
+                        <span class="input-group-btn ">
+                            <button class="btn btn-info" id="postVerifycode" onclick="postVerifyCode()"  type="button">发送验证码</button>
+                        </span>
+                    </div><!-- /input-group -->
+                </div>
+            </div><!-- /.col-lg-6 -->
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <input type="password" id="verifyCode" class="form-control"  placeholder="请输入验证码...">
+
+                </div>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block" onclick="phoneLogin()" type="button">登陆</button>
+
+        </form>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap-3.3.7-distjs/bootstrap.min.js"></script>
+<!-- bootbox code -->
+<script src="js/botbox/bootbox.min.js"></script>
+<script src="js/botbox/bootbox.locales.min.js"></script>
+<script src="js/jquery.cookie.min.js"></script>
+<script src="js/jquery.qrcode.min.js"></script>
+<script>
+    //用户名  密码 登陆
+    function logincheck(){
+        var userName = $("#userName").val();
+        var password = $("#password").val();
+
+        $.ajax({
+            url:"http://localhost:8087/members/login",
+            data:{"userName":userName,"password":password},
+            type:"post",
+            success:function(result){
+                if(result.code == 200){
+                    $.cookie("fh_memberInfo",result.data);
+                    location.href="/index.html";
+                }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+                    })
+                }
+            }
+
+        });
+
+    }
+
+
+    // 初始化 tab 标签页
+    $('#myTabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
+
+
+    //发送验证码
+    function postVerifyCode(){
+
+        var phone = $("#phone").val();
+        if(!phone){
+            bootbox.alert({
+                title:"提示信息",
+                message:"<i class='glyphicon glyphicon-exclamation-sign'></i>请输入手机号",
+                size: 'small',
+            })
+            return ;
+        }
+        $.ajax({
+            url:"http://localhost:8087/sms",
+            type:"get",
+            data:{"phone":phone,"flag":1},
+            success:function(result){
+                if(result.code == 200){
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>验证码的发送成功请尽快输入 十分钟有效期",
+                        size: 'small',
+                    })
+                    //倒计时
+                    countDown();
+                }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+                    })
+                }
+
+            }
+        });
+    }
+
+    //验证码登陆
+    function phoneLogin(){
+        var phone = $("#phone").val();
+        var verifyCode = $("#verifyCode").val();
+        $.ajax({
+            url:"http://localhost:8087/members/phoneLogin",
+            type:"get",
+            data:{"phone":phone,"verifyCode":verifyCode},
+            success:function(result){
+                if(result.code == 200){
+                    $.cookie("fh_memberInfo",result.data);
+                    location.href="/index.html";
+                }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+                    })
+                }
+
+            }
+        });
+
+    }
+
+
+
+    //时间倒计时
+    function countDown(){
+        var obj = $("#postVerifycode")
+        var   count = 60*10;
+        setInterval(
+            function(){
+                if(count >= 0){
+                    count--;
+                    obj.prop("disabled",true);
+                    obj.html(count+"秒");
+                }
+                else{
+                    obj.html("发送验证码");
+                    obj.prop("disabled",false);
+                    clearInterval();
+                }
+            },1000
+        )
+
+
+    }
+</script>
+
+
+<script>
+    function WXpay(){
+        $.ajax({
+            url:"http://localhost:8087/WXpay",
+            type:"get",
+            success:function(result){
+                console.log(result.data);
+                if(result.code == 200){
+                        var data = result.data ;
+                    jQuery('#qrcode').qrcode(data.code_url);
+                /*  var qrcode =   new QRCode(document.getElementById('qrcode'),data.code_url);
+                    qrcode.clear(); // 清除代码
+                    qrcode.makeCode("http://www.w3cschool.cc"); // 生成另外一个二维码*/
+                }
+
+            }
+
+        });
+
+    }
+
+</script>
+
+
+</body>
+</html>

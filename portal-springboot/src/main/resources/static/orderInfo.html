@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>订单结算</title>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+	<link rel="stylesheet" href="js/DataTables/css/dataTables.bootstrap.min.css"/>
+	<link rel="stylesheet" href="js/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+	<link rel="stylesheet" href="js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css"/>
+	<link rel="stylesheet" href="js/fileinput5/css/fileinput.css"/>
+	<link rel="stylesheet" href="js/bootstrap-select-1.12.4/dist/css/bootstrap-select.css"/>
+	<link rel="stylesheet" href="js/ztree/css/zTreeStyle/zTreeStyle.css">
+	<link rel="icon" href="js/shop/assets/img/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="js/shop/css/webbase.css" />
+	<link rel="stylesheet" type="text/css" href="js/shop/css/pages-JD-index.css" />
+	<link rel="stylesheet" type="text/css" href="js/shop/css/widget-jquery.autocomplete.css" />
+	<link rel="stylesheet" type="text/css" href="js/shop/css/widget-cartPanelView.css" />
+	<link rel="stylesheet" type="text/css" href="js/shop/css/pages-getOrderInfo.css" />
+
+</head>
+
+<body>
+<!--head-->
+<!-- 导航条 -->
+<div id="nav"></div>
+<!-- 主要信息展示DIV -->
+<div id="orderShowDiv" class="cart py-container">
+	<!--logoArea-->
+	<div class="logoArea">
+		<div class="fl logo"><span class="title">结算页</span></div>
+		<div class="fr search">
+			<form class="sui-form form-inline">
+				<div class="input-append">
+					<input type="text" type="text" class="input-error input-xxlarge" placeholder="品优购自营" />
+					<button class="sui-btn btn-xlarge btn-danger" type="button">搜索</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!--主内容-->
+	<div class="checkout py-container">
+		<div class="checkout-tit">
+			<h4 class="tit-txt">填写并核对订单信息</h4>
+		</div>
+		<div class="checkout-steps" >
+			<!--收件人信息-->
+			<div class="step-tit">
+				<h5>收件人信息<span><a href="#" onclick="insertAddress()" >新增收货地址</a></span></h5>
+			</div>
+			<div class="step-cont" id="addressInfoShowDiv">
+
+			</div>
+			<!--  地址信息展示-------------------------------------------------------------------------------   -->
+			<div class="step-cont">
+				<div class="addressInfo">
+					<ul class="addr-detail">
+						<li class="addr-item" id="showAddressDiv">
+
+							<div>
+								<div class="con name selected"><a href="javascript:;" >张默<span title="点击取消选择">&nbsp;</span></a></div>
+								<div class="con address">张默 北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span>
+									<span class="base">默认地址</span>
+									<span class="edittext"><a data-toggle="modal" data-target=".edit" data-keyboard="false" >编辑</a>&nbsp;&nbsp;<a href="javascript:;">删除</a></span>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+							<div>
+								<div class="con name"><a href="javascript:;">李煜<span title="点击取消选择">&nbsp;</a></div>
+								<div class="con address">李煜 北京市海淀区三环内 中关村软件园8号楼 <span>187****4201</span>
+									<span class="edittext"><a data-toggle="modal" data-target=".edit" data-keyboard="false" >编辑</a>&nbsp;&nbsp;<a href="javascript:;">删除</a></span>
+								</div>
+								<div class="clearfix"></div>
+							</div>
+
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="hr"></div>
+			<!--支付和送货-->
+			<div class="payshipInfo">
+				<div class="step-tit">
+					<h5>支付方式</h5>
+				</div>
+				<div class="step-cont">
+					<ul class="payType">
+						<li class="selected">微信付款<span title="点击取消选择"></span></li>
+						<li>货到付款<span title="点击取消选择"></span></li>
+					</ul>
+				</div>
+				<div class="hr"></div>
+				<div class="step-tit">
+					<h5>送货清单</h5>
+				</div>
+<!--  ----------------------------------------------订单信息展示---------------------------------------->
+				<div class="step-cont">
+					<ul class="send-detail" id="showOrderInfoUL">
+
+					</ul>
+				</div>
+			</div>
+			<div class="linkInfo">
+				<div class="step-tit">
+					<h5>发票信息</h5>
+				</div>
+				<div class="step-cont">
+					<span>普通发票（电子）</span>
+					<span>个人</span>
+					<span>明细</span>
+				</div>
+			</div>
+			<div class="cardInfo">
+				<div class="step-tit">
+					<h5>使用优惠/抵用</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!---------------------------------------  总计  数据  *--------------------------------------  -->
+	<div class="order-summary" id="totalInfoShowDiv">
+		<div class="static fr">
+			<div class="list">
+				<span><i class="number">##tatalCount##</i>件商品，总商品金额</span>
+				<em class="allprice">¥##totalPrice##</em>
+			</div>
+			<div class="list">
+				<span>返现：</span>
+				<em class="money">0.00</em>
+			</div>
+			<div class="list">
+				<span>运费：</span>
+				<em class="transport">0.00</em>
+			</div>
+		</div>
+	</div>
+	<!----------------------------------------- 应付金额--------------------------------------------------- -->
+	<div class="clearfix trade" id="payAbleMoneyDiv">
+		<div class="fc-price">应付金额:　<span class="price">##totalPrice##</span></div>
+		<div class="fc-receiverInfo">寄送至:北京市海淀区三环内 中关村软件园9号楼 收货人：某某某 159****3201</div>
+	</div>
+	<div class="submit">
+		<a class="sui-btn btn-danger btn-xlarge" href="#" onclick="submitOrder()">提交订单</a>
+	</div>
+</div>
+<!-- 底部栏位 -->
+<!--页面底部-->
+<div class="clearfix footer">
+	<div class="py-container">
+		<div class="footlink">
+			<div class="Mod-service">
+				<ul class="Mod-Service-list">
+					<li class="grid-service-item intro  intro1">
+
+						<i class="serivce-item fl"></i>
+						<div class="service-text">
+							<h4>正品保障</h4>
+							<p>正品保障，提供发票</p>
+						</div>
+
+					</li>
+					<li class="grid-service-item  intro intro2">
+
+						<i class="serivce-item fl"></i>
+						<div class="service-text">
+							<h4>正品保障</h4>
+							<p>正品保障，提供发票</p>
+						</div>
+
+					</li>
+					<li class="grid-service-item intro  intro3">
+
+						<i class="serivce-item fl"></i>
+						<div class="service-text">
+							<h4>正品保障</h4>
+							<p>正品保障，提供发票</p>
+						</div>
+
+					</li>
+					<li class="grid-service-item  intro intro4">
+
+						<i class="serivce-item fl"></i>
+						<div class="service-text">
+							<h4>正品保障</h4>
+							<p>正品保障，提供发票</p>
+						</div>
+
+					</li>
+					<li class="grid-service-item intro intro5">
+
+						<i class="serivce-item fl"></i>
+						<div class="service-text">
+							<h4>正品保障</h4>
+							<p>正品保障，提供发票</p>
+						</div>
+
+					</li>
+				</ul>
+			</div>
+			<div class="clearfix Mod-list">
+				<div class="yui3-g">
+					<div class="yui3-u-1-6">
+						<h4>购物指南</h4>
+						<ul class="unstyled">
+							<li>购物流程</li>
+							<li>会员介绍</li>
+							<li>生活旅行/团购</li>
+							<li>常见问题</li>
+							<li>购物指南</li>
+						</ul>
+
+					</div>
+					<div class="yui3-u-1-6">
+						<h4>配送方式</h4>
+						<ul class="unstyled">
+							<li>上门自提</li>
+							<li>211限时达</li>
+							<li>配送服务查询</li>
+							<li>配送费收取标准</li>
+							<li>海外配送</li>
+						</ul>
+					</div>
+					<div class="yui3-u-1-6">
+						<h4>支付方式</h4>
+						<ul class="unstyled">
+							<li>货到付款</li>
+							<li>在线支付</li>
+							<li>分期付款</li>
+							<li>邮局汇款</li>
+							<li>公司转账</li>
+						</ul>
+					</div>
+					<div class="yui3-u-1-6">
+						<h4>售后服务</h4>
+						<ul class="unstyled">
+							<li>售后政策</li>
+							<li>价格保护</li>
+							<li>退款说明</li>
+							<li>返修/退换货</li>
+							<li>取消订单</li>
+						</ul>
+					</div>
+					<div class="yui3-u-1-6">
+						<h4>特色服务</h4>
+						<ul class="unstyled">
+							<li>夺宝岛</li>
+							<li>DIY装机</li>
+							<li>延保服务</li>
+							<li>品优购E卡</li>
+							<li>品优购通信</li>
+						</ul>
+					</div>
+					<div class="yui3-u-1-6">
+						<h4>帮助中心</h4>
+						<img src="img/wx_cz.jpg">
+					</div>
+				</div>
+			</div>
+			<div class="Mod-copyright">
+				<ul class="helpLink">
+					<li>关于我们<span class="space"></span></li>
+					<li>联系我们<span class="space"></span></li>
+					<li>关于我们<span class="space"></span></li>
+					<li>商家入驻<span class="space"></span></li>
+					<li>营销中心<span class="space"></span></li>
+					<li>友情链接<span class="space"></span></li>
+					<li>关于我们<span class="space"></span></li>
+					<li>营销中心<span class="space"></span></li>
+					<li>友情链接<span class="space"></span></li>
+					<li>关于我们</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<!--页面底部END-->
+
+<!--  订单信息 模板 -->
+<div id="showOrderInfoTemplate" style="display: none">
+<li>
+
+	<div class="sendGoods">
+
+		<ul class="yui3-g">
+			<li class="yui3-u-1-6">
+				<span><img src="##imgURL##"/></span>
+			</li>
+			<li class="yui3-u-7-12">
+				<div class="desc">##productName##</div>
+				<div class="seven">7天无理由退货</div>
+			</li>
+			<li class="yui3-u-1-12">
+				<div class="price">￥##price##</div>
+			</li>
+			<li class="yui3-u-1-12">
+				<div class="num">X##productCount##</div>
+			</li>
+			<li class="yui3-u-1-12">
+				<div class="exit">有货</div>
+			</li>
+		</ul>
+	</div>
+</li>
+</div>
+
+
+<!-- 地址模板 -->
+<div id="addressTemplateDiv">
+<div>
+	<div class="con name ##selected##" name="CheckedStatus" onclick="updateCheckedStatus(this)"><a href="javascript:;" >##memberName##<span title="点击取消选择">&nbsp;</span></a></div>
+	<div class="con address" id="updateAddressInfoDiv##id##"   onmouseover='mouseover($("#updateAddressInfoDiv##id##"),$("#updateAddressInfoSpan##id##"))' onmouseout='mouseout($("#updateAddressInfoDiv##id##"),$("#updateAddressInfoSpan##id##"))'><i>##memberName##</i>##address##<span>##phone##</span>
+		<span   style="display: none" id="updateAddressInfoSpan##id##"><a data-toggle="modal" data-target=".edit" href="#" onclick="updateAddress('##id##')" data-keyboard="false" >编辑</a>&nbsp;&nbsp;<a href="javascript:;" onclick="deleteAddress('##id##')">删除</a></span>
+	</div>
+	<div class="clearfix"></div>
+</div>
+</div>
+
+<!-- 新增地址模板 -->
+<div id="insertAddessDic" style="display: none">
+	<div>
+
+
+	<form class="form-horizontal" >
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">收货人:</label>
+			<div class="col-sm-4">
+				<input type="text"   id="insertTakeName" class="form-control"  placeholder="收货人..." >
+			</div>
+		</div>
+
+		<div class="form-group" id="areaSelectListadd">
+			<label  class="col-sm-2 control-label">地区：</label>
+
+		</div>
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">手机号：</label>
+			<div class="col-sm-4">
+				<div class="input-group" >
+					<input type="text" class="form-control" id="insertPhone" placeholder="手机号...">
+				</div><!-- /input-group -->
+			</div>
+		</div><!-- /.col-lg-6 -->
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">详细地址:</label>
+			<div class="col-sm-4">
+				<input type="password" id="insertDetail" class="form-control"  placeholder="详细地址...">
+			</div>
+		</div>
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">邮箱:</label>
+			<div class="col-sm-4">
+				<input type="password" id="insertEmail" class="form-control"  placeholder="邮箱...">
+			</div>
+		</div>
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">别名:</label>
+			<div class="col-sm-4">
+				<input type="radio" name="insertalias"  value="1" > 家
+				<input type="radio" name="insertalias"  value="2" > 公司
+				<input type="radio" name="insertalias"  value="3" > 父母家
+			</div>
+		</div>
+		<div class="form-group">
+			<label  class="col-sm-2 control-label">是否默认地址:</label>
+			<div class="col-sm-4">
+				<input type="radio" name="insertdefaultAddress"  value="1" > 是
+				<input type="radio" name="insertdefaultAddress"  value="2" > 否
+			</div>
+		</div>
+
+	</form>
+
+	</div>
+</div>
+
+<!-- 修改地址模板 -->
+<div id="updateAddessDic" style="display: none">
+    <div>
+
+
+        <form class="form-horizontal" >
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">收货人:</label>
+                <div class="col-sm-4">
+                    <input type="text"   id="updateTakeName" class="form-control"  placeholder="收货人..." >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">地区：</label>
+                <div class="col-sm-10">
+                    <div id="areaSelectListupdate" style="width: auto">
+
+                    </div>
+                    <span id="update_AreaSpan"></span>
+
+                    <button type="button" value="1" onclick="update_AreaStyle(this)" class="btn btn-primary" id="update_AreaButton"><i class='glyphicon glyphicon-pencil'></i>编辑</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">手机号：</label>
+                <div class="col-sm-4">
+                    <div class="input-group" >
+                        <input type="text" class="form-control" id="updatePhone" placeholder="手机号...">
+                    </div><!-- /input-group -->
+                </div>
+            </div><!-- /.col-lg-6 -->
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">详细地址:</label>
+                <div class="col-sm-4">
+                    <input type="password" id="updateDetail" class="form-control"  placeholder="详细地址...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">邮箱:</label>
+                <div class="col-sm-4">
+                    <input type="password" id="updateEmail" class="form-control"  placeholder="邮箱...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label  class="col-sm-2 control-label">别名:</label>
+                <div class="col-sm-4">
+                    <input type="radio" name="updatealias"  value="1" > 家
+                    <input type="radio" name="updatealias"  value="2" > 公司
+                    <input type="radio" name="updatealias"  value="3" > 父母家
+                </div>
+            </div>
+			<div class="form-group">
+                <label  class="col-sm-2 control-label">是否默认:</label>
+                <div class="col-sm-4">
+                    <input type="radio" name="updatedefaultAddress"  value="1" > 是
+                    <input type="radio" name="updatedefaultAddress"  value="2" > 否
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+<!--  展示未支付成功模板  -->
+<div id="payErrorTempLate" style="display: none">
+	<li>
+
+		<div class="sendGoods">
+
+			<ul class="yui3-g">
+				<li class="yui3-u-1-6">
+					<span><img src="##imgURL##"/></span>
+				</li>
+				<li class="yui3-u-7-12">
+					<div class="desc">##productName##</div>
+					<div class="seven">7天无理由退货</div>
+				</li>
+				<li class="yui3-u-1-12">
+					<div class="price">￥##price##</div>
+				</li>
+				<li class="yui3-u-1-12">
+					<div class="num">X##productCount##</div>
+				</li>
+				<li class="yui3-u-1-12">
+					<div class="exit">无货</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+</div>
+
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/DataTablesjs/jquery.dataTables.min.js"></script>
+<script src="js/DataTablesjs/dataTables.bootstrap.min.js"></script>
+<script src="js/bootstrap-3.3.7-distjs/bootstrap.min.js"></script>
+<script src="js/botbox/bootbox.min.js"></script>
+<script src="js/botbox/bootbox.locales.min.js"></script>
+<script src="js/bootstrap-datetimepickerjs/moment-with-locales.js"></script>
+<script src="js/bootstrap-datetimepickerjs/bootstrap-datetimepicker.min.js"></script>
+<script src="js/fileinput5js/fileinput.js"></script>
+<script src="js/fileinput5js/locales/zh.js"></script>
+<script src="js/bootstrap-select-1.12.4js/bootstrap-select.js"></script>
+<script src="js/bootstrap-select-1.12.4js/i18n/defaults-zh_CN.js"></script>
+<script type="text/javascript" src="js/shopjs/pages/getOrderInfo.js"></script>
+<script src="js/ztreejs/jquery.ztree.all.min.js"></script>
+<script src="js/jquery.cookie.min.js"></script>
+<script src="js/nav.js"></script>
+
+
+
+<script>
+    var addAddress;
+    var updateAddessDic;
+	$(function(){
+        //获取token
+        getToken();
+		//初始化订单页
+	    initOrderInfo();
+       addAddress =  $("#insertAddessDic").html();
+        $("#insertAddessDic").html("");
+        updateAddessDic =  $("#updateAddessDic").html();
+        $("#updateAddessDic").html("");
+
+
+
+	});
+	//获取地址信息
+	function initAddress(){
+        $.ajax({
+            url:"http://localhost:8087/address",
+            type:"get",
+            success:function(result){
+                console.log(result.data)
+                if(result.code == 200){
+					var data = result.data;
+                    var template = $("#addressTemplateDiv").html();
+                    $("#showAddressDiv").html("");
+					for(var i =0; i <data.length ; i++){
+					    var addressInfo = data[i];
+                      var str ='';
+                        if(addressInfo.defaultAddress == 1){
+                            str =  template.replace(/##memberName##/g,addressInfo.takePeople)
+                                .replace(/##address##/g,addressInfo.ssxName+addressInfo.detailAddress+'<span class="base">默认地址</span>' +
+                                    '\t\t&nbsp;&nbsp;&nbsp;')
+								.replace(/##id##/g,addressInfo.id)
+								.replace(/##phone##/g,addressInfo.takePhone)
+								.replace(/##selected##/g,'selected')
+                        }else{
+                            str =  template.replace(/##memberName##/g,addressInfo.takePeople)
+                                .replace(/##address##/g,addressInfo.ssxName+addressInfo.detailAddress+addressInfo.takePhone)
+                                .replace(/##id##/g,addressInfo.id)
+                                .replace(/##phone##/g,addressInfo.takePhone)
+                                .replace(/##selected##/g,'')
+                        }
+						$("#showAddressDiv").append(str);
+
+					}
+                }
+            }
+
+        })
+
+	}
+
+	//初始化订单页
+	function initOrderInfo(){
+	    //判断用户是否登陆
+		if(!loginFlag){
+		    //没有登陆 显示提示登陆注册
+		    $("#orderShowDiv").html('<div style="text-align: center" ><h1>还没有登陆，请先<a href="login.html">登陆</a>或者<a href="register.html">注册</a></h1></div>');
+			//终止方法继续运行
+		    return ;
+		}
+       //登陆成功  获取订单信息  收件人信息
+		//获取订单信息
+        initCart();
+        initAddress();
+	}
+
+//提交订单
+	function submitOrder(){
+        $.ajax({
+            url:"http://localhost:8087/order",
+            type:"post",
+            success:function(result){
+                if(result.code == 200){
+                  var data = result.data;
+                  var str = JSON.stringify(data);
+                  if(data.length > 0){
+                      var str = '';
+                      var templateStr = $("#payErrorTempLate").html();
+                      for(var i =0; i<data.length ;i++){
+                          var product = data[i];
+                           str =  templateStr.replace(/##imgURL##/g,product.imgURL)
+                              .replace(/##productName##/g,product.productName)
+                              .replace(/##price##/g,product.price)
+                              .replace(/##productCount##/g,product.productCount)
+                              .replace(/##allPrice##/g,product.allPrice)
+
+                      }
+
+
+
+                      bootbox.dialog({
+                          message: str,
+                          title:"订单情况",
+                          size:"large",
+                          buttons: {
+                              confirm: {
+                                  label: '<i class="glyphicon glyphicon-ok"></iclass>确定',
+                                  className: 'btn-success',
+                                  callback: function () {
+                                      location.href="/pay.html";
+                                  },
+
+                              },
+                          }
+                      });
+
+
+
+
+				  }
+                   else{
+                      location.href="/pay.html";
+				  }
+				  }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+
+                    });
+				  }
+                }
+        })
+	}
+
+
+//获取token
+	function getToken(){
+        $.ajax({
+            url:"http://localhost:8087/token",
+            type:"get",
+            success:function(result){
+                if(result.code == 200){
+					var data = result.data;
+                    $.cookie("token_idempotent",data);
+                }
+            }
+
+        })
+
+	}
+
+
+    //获取订单信息
+    function initCart(){
+        $.ajax({
+            url:"http://localhost:8087/cart",
+            type:"get",
+            success:function(result) {
+                if (result.code == 3002) {
+                    location.href="/cart.html"
+                    return;
+                }
+                else if (result.code == 200) {
+                    var v_cart = result.data;
+                    var v_productInfos = v_cart.productInfoList;
+                    var v_cartTemplate = $("#showOrderInfoTemplate").html();
+                    var str = '';
+                    //循环拼接订单信息字符串  替换模板
+                    for(var i = 0 ; i < v_productInfos.length ; i++){
+                        var product = v_productInfos[i];
+                        str +=   v_cartTemplate.replace(/##imgURL##/g,product.imgURL)
+                            .replace(/##productName##/g,product.productName)
+                            .replace(/##price##/g,product.price)
+                            .replace(/##productCount##/g,product.productCount)
+                            .replace(/##allPrice##/g,product.allPrice)
+                            .replace(/##productId##/g,product.id)
+                    }
+                    //将拼接字符串 赋值给订单信息展示位置UL
+                    $("#showOrderInfoUL").html(str);
+
+					//商品总计 赋值
+					var totalInfoShowDiv = $("#totalInfoShowDiv").html();
+                    totalInfoShowDiv = totalInfoShowDiv.replace(/##totalPrice##/g,v_cart.totalPrice)
+                       				 .replace(/##tatalCount##/g,v_cart.tatalCount);
+                    $("#totalInfoShowDiv").html(totalInfoShowDiv);
+
+                    //应付金额 赋值
+					var payAbleMoneyDiv = $("#payAbleMoneyDiv").html();
+                    payAbleMoneyDiv = payAbleMoneyDiv.replace(/##totalPrice##/g,v_cart.totalPrice);
+                    $("#payAbleMoneyDiv").html(payAbleMoneyDiv)
+                }
+            }
+
+        })
+    }
+
+    //修改地址信息
+    var updateAddressInfo;
+	function updateAddress(id){
+        $.ajax({
+            url:"http://localhost:8087/address/findAddressById",
+            type:"get",
+			data:{"id":id},
+            success:function(result){
+                if(result.code == 200){
+                    var data = result.data;
+                    $("#updateAddessDic").html(updateAddessDic)
+                    $("#updateTakeName",insertAddressInfo).val(data.takePeople);
+                   $("#updatePhone",insertAddressInfo).val(data.takePhone);
+                     $("#updateDetail",insertAddressInfo).val(data.detailAddress);
+                    $("#updateEmail",insertAddressInfo).val(data.email);
+                    $("#update_AreaSpan").html(data.ssxName);
+                     $($("input[name='updatealias']")).each(function(){
+                         if(this.value == data.alias){
+                             this.checked = true;
+                         }
+                     })
+					$($("input[name='updatedefaultAddress']")).each(function(){
+                         if(this.value == data.defaultAddress){
+                             this.checked = true;
+                         }
+                     })
+
+                   updateAddressInfo =  bootbox.dialog({
+                        message: $("#updateAddessDic form"),
+                        title:"修改地址",
+                        backdrop:false,
+                        size:"large",
+                        buttons: {
+                            confirm: {
+                                label: '<i class="glyphicon glyphicon-ok"></iclass>修改地址',
+                                className: 'btn-success',
+                                callback:function(){
+                                    var takePeople = $("#updateTakeName",updateAddressInfo).val();
+                                    var takePhone = $("#updatePhone",updateAddressInfo).val();
+                                    var detailAddress = $("#updateDetail",updateAddressInfo).val();
+                                    var email = $("#updateEmail",updateAddressInfo).val();
+                                    var shengId = $($("select[name='selectAreaupdate']")[0]).val();
+                                    var shiId = $($("select[name='selectAreaupdate']")[1]).val();
+                                    var xianId = $($("select[name='selectAreaupdate']")[2]).val();
+                                    var alias = $($("input[name='updatealias']:checked")).val();
+                                    var defaultAddress = $($("input[name='updatedefaultAddress']:checked")).val();
+                                    var param = {};
+                                    param.takePeople = takePeople;
+                                    param.takePhone = takePhone;
+                                    param.detailAddress = detailAddress;
+                                    param.email = email;
+                                    param.shengId = shengId;
+                                    param.shiId = shiId;
+                                    param.xianId = xianId;
+                                    param.alias = alias;
+                                    param.id = id;
+                                    param.defaultAddress = defaultAddress;
+                                    alert(JSON.stringify(param))
+                                    $.ajax({
+                                        url:"http://localhost:8087/address/updateAddress",
+                                        type:"post",
+                                        data:param,
+                                        success:function(result){
+                                            if(result.code == 200){
+                                                initAddress();
+                                            }
+                                        }
+
+                                    })
+
+                                }
+                            },
+                            cancel: {
+                                label: '<i class="glyphicon glyphicon-remove"></i>取消',
+                                className: 'btn-danger'
+                            }
+                        },
+
+                    });
+
+                }
+            }
+
+        })
+	}
+
+	//删除地址信息
+	function deleteAddress(id){
+	    //获取所有信息
+        $.ajax({
+            url:"http://localhost:8087/address/deleteAddress",
+            type:"post",
+			data:{"id":id},
+            success:function(result){
+                if(result.code == 200){
+                    initAddress();
+                }
+            }
+
+        })
+	}
+
+
+	//新增地址
+	var insertAddressInfo;
+	function insertAddress(){
+        insertAddressInfo =  bootbox.dialog({
+        message:addAddress,
+        title:"新增地址",
+        backdrop:false,
+        size:"large",
+        buttons: {
+            confirm: {
+                label: '<i class="glyphicon glyphicon-ok"></iclass>新增地址',
+                className: 'btn-success',
+                callback:function(){
+                    var takePeople = $("#insertTakeName",insertAddressInfo).val();
+                    var takePhone = $("#insertPhone",insertAddressInfo).val();
+                    var detailAddress = $("#insertDetail",insertAddressInfo).val();
+                    var email = $("#insertEmail",insertAddressInfo).val();
+					var shengId = $($("select[name='selectAreaadd']")[0]).val();
+					var shiId = $($("select[name='selectAreaadd']")[1]).val();
+					var xianId = $($("select[name='selectAreaadd']")[2]).val();
+					var alias = $($("input[name='insertalias']:checked")).val();
+					var defaultAddress = $($("input[name='insertdefaultAddress']:checked")).val();
+					var param = {};
+                    param.takePeople = takePeople;
+                    param.takePhone = takePhone;
+                    param.detailAddress = detailAddress;
+                    param.email = email;
+                    param.shengId = shengId;
+                    param.shiId = shiId;
+                    param.xianId = xianId;
+                    param.alias = alias;
+                    param.defaultAddress = defaultAddress;
+                    $.ajax({
+                        url:"http://localhost:8087/address",
+                        type:"post",
+                        data:param,
+                        success:function(result){
+                            if(result.code == 200){
+                                initAddress();
+                            }
+                        }
+
+                    })
+
+                }
+            },
+            cancel: {
+                label: '<i class="glyphicon glyphicon-remove"></i>取消',
+                className: 'btn-danger'
+            }
+        },
+
+    });
+
+        initArea(0,"add");
+	}
+
+
+    //三级下拉框
+    function initArea(obj,prefix){
+        var id = 0;
+        if(!!$(obj).val()){
+            id = $(obj).val();
+            $(obj).parent().nextAll().remove();
+        }
+        $.ajax({
+            url:"http://localhost:8087/areas/children/"+id+"",
+            success:function(result){
+                if(result.code == 200){
+                    var dataArr = result.data;
+                    if(dataArr.length < 1){
+
+                        return ;
+                    }
+
+                    //拼接前缀
+                    var str = '<div class="col-sm-2">' +
+                        '<select name ="selectArea'+prefix+'" class="form-control"  onchange="initArea($(this),\''+prefix+'\')" >' +
+                        '<option value="-1">==请选择==</option>';
+
+                    //拼接 动态部分
+                    for(var i = dataArr.length-1 ; i>=0 ; i--){
+                        str += '<option value ="'+dataArr[i].id+'">'+dataArr[i].name+'</option>';
+                    }
+                    //拼接后缀
+                    str += '</select>' +
+                        '</div>';
+                    $("#areaSelectList"+prefix,insertAddressInfo).append(str);
+                }
+            }
+        });
+
+
+    }
+
+    //三级下拉框
+    function initAreaUpdate(obj,prefix){
+        var id = 0;
+        if(!!$(obj).val()){
+            id = $(obj).val();
+            $(obj).parent().nextAll().remove();
+        }
+        $.ajax({
+            url:"http://localhost:8087/areas/children/"+id+"",
+            success:function(result){
+                if(result.code == 200){
+                    var dataArr = result.data;
+                    if(dataArr.length < 1){
+                        return ;
+                    }
+                    //拼接前缀
+                    var str = '<div class="col-sm-2">' +
+                        '<select name ="selectArea'+prefix+'" class="form-control"  onchange="initArea($(this),\''+prefix+'\')" >' +
+                        '<option value="-1">==请选择==</option>';
+
+                    //拼接 动态部分
+                    for(var i = dataArr.length-1 ; i>=0 ; i--){
+                        str += '<option value ="'+dataArr[i].id+'">'+dataArr[i].name+'</option>';
+                    }
+                    //拼接后缀
+                    str += '</select>' +
+                        '</div>';
+
+                    $("#areaSelectList"+prefix,updateAddressInfo).append(str);
+                }
+            }
+        });
+    }
+
+
+    //地址显示隐藏 编辑 删除按钮
+    function mouseover(obj,span){
+        $(obj).prop("class","con address address-hover")
+        $(span).show();
+
+
+    }
+    function mouseout(obj,span){
+        $(obj).prop("class","con address")
+        $(span).hide();
+    }
+
+    //修改地区
+    function update_AreaStyle(obj){
+
+        if($(obj).val() == 1){
+            $(obj).val(2)
+            $("#update_AreaButton").html("<i class='glyphicon glyphicon-pencil'></i>退出编辑")
+            $("#update_AreaSpan").hide();
+            initAreaUpdate(0,"update");
+            return ;
+        }
+
+        $(obj).val(1)
+        $("#update_AreaButton").html("<i class='glyphicon glyphicon-pencil'></i>编辑")
+        $("#update_AreaSpan").show();
+        $("select[name='selectAreaupdate']").parent().remove();
+
+    }
+
+    //修改选中状态
+	function updateCheckedStatus(obj){
+	    $("[name='CheckedStatus']").prop("class","con name")
+	    $(obj).prop("class","con name selected")
+
+
+	}
+
+
+</script>
+
+
+</body>
+
+</html>

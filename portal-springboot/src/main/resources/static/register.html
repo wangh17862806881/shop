@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册页面</title>
+    <link rel="stylesheet" href="js/DataTables/css/dataTables.bootstrap.min.css"/>
+    <link rel="stylesheet" href="js/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css"/>
+    <link rel="stylesheet" href="js/fileinput5/css/fileinput.css"/>
+    <link rel="stylesheet" href="js/bootstrap-select-1.12.4/dist/css/bootstrap-select.css"/>
+    <link rel="stylesheet" href="js/ztree/css/zTreeStyle/zTreeStyle.css">
+    <link rel="icon" href="js/shop/assets/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/widget-cartPanelView.css" />
+</head>
+<body>
+
+
+
+<form class="form-horizontal" >
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">用户名:</label>
+        <div class="col-sm-4">
+            <input type="text"   id="userName" class="form-control"  placeholder="用户名..." onblur="userNameVerify()">
+        </div>
+        <span id="userNameVerify" style="display: none" >*用户名已存在</span>
+    </div>
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">真实姓名:</label>
+        <div class="col-sm-4">
+            <input type="text" id="realName" class="form-control"  placeholder="真实姓名...">
+        </div>
+    </div>
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">邮箱:</label>
+        <div class="col-sm-4">
+            <input type="text" id="email" class="form-control" onblur="emailVerify()"  placeholder="请输入邮箱...">
+        </div>
+        <span id="emailVerify" style="display: none">*邮箱已存在</span>
+    </div>
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">密码:</label>
+        <div class="col-sm-4">
+            <input type="password" id="password" class="form-control"  placeholder="密码...">
+        </div>
+    </div>
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">确认密码:</label>
+        <div class="col-sm-4">
+            <input type="password" id="confirmPassword" class="form-control"  placeholder="请确认密码...">
+
+        </div>
+    </div>
+    <div class="form-group" id="areaSelectList">
+        <label  class="col-sm-2 control-label">地区：</label>
+
+    </div>
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">手机号：</label>
+        <div class="col-sm-4">
+            <div class="input-group" >
+                <input type="text" class="form-control" onblur="phoneVerify()" id="phone" placeholder="Search for...">
+                <span class="input-group-btn ">
+            <button class="btn btn-info" id="postVerifycode" onclick="postVerifyCode()"  type="button">发送验证码</button>
+      </span>
+            </div><!-- /input-group -->
+        </div>
+        <span id="phoneVerify" style="display: none">*手机已存在</span>
+    </div><!-- /.col-lg-6 -->
+    <div class="form-group">
+        <label  class="col-sm-2 control-label">验证码:</label>
+        <div class="col-sm-4">
+            <input type="password" id="verifyCode" class="form-control"  placeholder="请输入验证码...">
+
+        </div>
+    </div>
+
+
+
+    <div style="text-align: center">
+        <button class="btn btn-primary" id="registerButton" onclick="addMember()" type="button"><span class="glyphicon glyphicon-search"></span >注册</button>
+        <button class="btn btn-default"  type="reset"><span class="glyphicon glyphicon-refresh"></span >重置</button>
+    </div>
+
+</form>
+
+
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/DataTablesjs/jquery.dataTables.min.js"></script>
+<script src="js/DataTablesjs/dataTables.bootstrap.min.js"></script>
+<script src="js/bootstrap-3.3.7-distjs/bootstrap.min.js"></script>
+<script src="js/botbox/bootbox.min.js"></script>
+<script src="js/botbox/bootbox.locales.min.js"></script>
+<script src="js/bootstrap-datetimepickerjs/moment-with-locales.js"></script>
+<script src="js/bootstrap-datetimepickerjs/bootstrap-datetimepicker.min.js"></script>
+<script src="js/fileinput5js/fileinput.js"></script>
+<script src="js/fileinput5js/locales/zh.js"></script>
+<script src="js/bootstrap-select-1.12.4js/bootstrap-select.js"></script>
+<script src="js/bootstrap-select-1.12.4js/i18n/defaults-zh_CN.js"></script>
+<script src="js/ztreejs/jquery.ztree.all.min.js"></script>
+
+<script>
+$(function(){
+    initArea();
+});
+    //三级下拉框
+    function initArea(obj){
+        var id = 0;
+        if(!!obj){
+            id = obj.val();
+            obj.parent().nextAll().remove();
+        }
+
+        $.ajax({
+            url:"http://localhost:8087/areas/children/"+id+"",
+
+            success:function(result){
+                if(result.code == 200){
+                    var dataArr = result.data;
+                    if(dataArr.length < 1){
+                        return ;
+                    }
+                    //拼接前缀
+                    var str = '<div class="col-sm-2">' +
+                        '<select name ="selectArea" class="form-control"  onchange="initArea($(this))" >' +
+                        '<option value="-1">==请选择==</option>';
+
+                    //拼接 动态部分
+                    for(var i = dataArr.length-1 ; i>=0 ; i--){
+                        str += '<option value ="'+dataArr[i].id+'">'+dataArr[i].name+'</option>';
+                    }
+                    //拼接后缀
+                    str += '</select>' +
+                        '</div>';
+
+                    $("#areaSelectList").append(str);
+                }
+            }
+        });
+
+
+    }
+
+    //新增 / 注册会员、
+    function addMember(){
+        var userName = $("#userName").val();
+        var realName = $("#realName").val();
+        var password = $("#password").val();
+        var email = $("#email").val();
+        var confirmPassword = $("#confirmPassword").val();
+        var phone = $("#phone").val();
+        var verifyCode = $("#verifyCode").val();
+        var areaArr = $("select[name='selectArea']")
+
+        if(password != confirmPassword || !password ){
+            bootbox.alert({
+                title:"提示信息",
+                message:"<i class='glyphicon glyphicon-exclamation-sign'></i>密码不一致或为空",
+                size: 'small',
+            })
+            return;
+        }
+
+        if(areaArr.length !=3 && $(areaArr[2]).val() != -1){
+            bootbox.alert({
+                title:"提示信息",
+                message:"<i class='glyphicon glyphicon-exclamation-sign'></i>请选择详细地区",
+                size: 'small',
+            })
+
+            return;
+        }
+
+        if(userName.replace(/ /g,"").length ==0){
+            alert("用户名不允许为空")
+            return ;
+        }
+        if(email.replace(/ /g,"").length ==0){
+            alert("邮箱不允许为空")
+            return ;
+        }
+        if(phone.replace(/ /g,"").length ==0){
+            alert("手机号不允许为空")
+            return ;
+        }
+        if(verifyCode.replace(/ /g,"").length ==0){
+            alert("验证码不允许为空")
+            return ;
+        }
+        if(realName.replace(/ /g,"").length ==0){
+            alert("真实姓名不允许为空")
+            return ;
+        }
+
+        var area1 = $(areaArr[0]).val();
+        var area2 = $(areaArr[1]).val();
+        var area3 = $(areaArr[2]).val();
+
+        var param ={};
+          param.areaId1 = area1;
+          param.areaId2 = area2;
+          param.areaId3 = area3;
+          param.userName = userName;
+          param.realName = realName;
+          param.password = password;
+          param.phone = phone;
+          param.code = verifyCode;
+          param.email = email;
+
+        $.ajax({
+            url:"http://localhost:8087/members",
+            type:"post",
+            data:param,
+            success:function(result){
+                if(result.code == 200){
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>注册成功请登陆",
+                        size: 'small',
+                    })
+                    location.href="/index.html"
+                }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+                    })
+                }
+            }
+
+        });
+
+    }
+    //发送验证码
+    function postVerifyCode(){
+
+        var phone = $("#phone").val();
+        if(!phone){
+            bootbox.alert({
+                title:"提示信息",
+                message:"<i class='glyphicon glyphicon-exclamation-sign'></i>请输入手机号",
+                size: 'small',
+            })
+            return ;
+        }
+
+
+
+        $.ajax({
+            url:"http://localhost:8087/sms",
+            type:"get",
+            data:{"phone":phone},
+            success:function(result){
+                if(result.code == 200){
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>验证码的发送成功请尽快输入 十分钟有效期",
+                        size: 'small',
+                    })
+                    //倒计时
+                    countDown();
+                }else{
+                    bootbox.alert({
+                        title:"提示信息",
+                        message:"<i class='glyphicon glyphicon-exclamation-sign'></i>"+result.msg,
+                        size: 'small',
+                    })
+                }
+
+            }
+        });
+    }
+
+    //时间倒计时
+    function countDown(){
+        var obj = $("#postVerifycode")
+        var   count = 60;
+        setInterval(
+            function(){
+                if(count >= 0){
+                    count--;
+                    obj.prop("disabled",true);
+                    obj.html(count+"秒");
+                }
+                else{
+                    obj.html("发送验证码");
+                    obj.prop("disabled",false);
+                    clearInterval();
+                }
+            },1000
+        )
+
+
+    }
+
+
+//验证唯一    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    //用户名验证
+    function userNameVerify() {
+      var userNameVerify = $("#userName").val()
+
+      $.ajax({
+           url:"http://localhost:8087/members/userNameVerify",
+           data:{"userNameVerify":userNameVerify},
+           type:"get",
+          async:false,
+           success:function(result){
+
+               if(result.code == 200 ){
+                   if(!$("#userNameVerify").is(":hidden")){
+                       $("#userNameVerify").hide();
+                       if($("#phoneVerify").is(":hidden") && $("#emailVerify").is(":hidden")){
+                           $("#registerButton").prop("disabled",false);
+                       }
+                   }
+               }else{
+
+                   $("#userNameVerify").show();
+                   $("#registerButton").prop("disabled",true);
+               }
+           }
+
+       })
+    }
+
+
+ //邮箱验证
+    function emailVerify() {
+      var emailVerify = $("#email").val();
+
+      $.ajax({
+           url:"http://localhost:8087/members/emailVerify",
+           data:{"emailVerify":emailVerify},
+           type:"get",
+          async:false,
+           success:function(result){
+               if(result.code == 200 ){
+                   $("#emailVerify").hide();
+                   if($("#userNameVerify").is(":hidden") &&$("#phoneVerify").is(":hidden") ){
+                       $("#registerButton").prop("disabled",false);
+                   }
+               }else{
+                   $("#emailVerify").show();
+                   $("#registerButton").prop("disabled",true);
+               }
+           }
+
+       })
+    }
+
+
+    //手机号验证
+    function phoneVerify() {
+      var phoneVerify = $("#phone").val();
+
+      $.ajax({
+           url:"http://localhost:8087/members/phoneVerify",
+           data:{"phoneVerify":phoneVerify},
+           type:"get",
+          async:false,
+           success:function(result){
+               if(result.code == 200 ){
+                   $("#postVerifycode").prop("disabled",false);
+                   $("#phoneVerify").hide();
+
+                   if( $("#userNameVerify").is(":hidden") && $("#emailVerify").is(":hidden")){
+                       $("#registerButton").prop("disabled",false);
+                   }
+
+               }else{
+                   $("#postVerifycode").prop("disabled",true);
+                   $("#phoneVerify").show();
+                   $("#registerButton").prop("disabled",true);
+               }
+           }
+
+       })
+    }
+
+
+
+</script>
+
+
+</body>
+</html>

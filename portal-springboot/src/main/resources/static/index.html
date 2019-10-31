@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <title>商城首页</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <link rel="stylesheet" href="js/DataTables/css/dataTables.bootstrap.min.css"/>
+    <link rel="stylesheet" href="js/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css"/>
+    <link rel="stylesheet" href="js/fileinput5/css/fileinput.css"/>
+    <link rel="stylesheet" href="js/bootstrap-select-1.12.4/dist/css/bootstrap-select.css"/>
+    <link rel="stylesheet" href="js/ztree/css/zTreeStyle/zTreeStyle.css">
+    <link rel="icon" href="js/shop/assets/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="js/shop/css/widget-cartPanelView.css" />
+    <style>
+        .dropdown-submenu {
+            position: relative;
+        }
+
+        .dropdown-submenu > .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -6px;
+            margin-left: -1px;
+            -webkit-border-radius: 0 6px 6px 6px;
+            -moz-border-radius: 0 6px 6px;
+            border-radius: 0 6px 6px 6px;
+        }
+
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-submenu > a:after {
+            display: block;
+            content: " ";
+            float: right;
+            width: 0;
+            height: 0;
+            border-color: transparent;
+            border-style: solid;
+            border-width: 5px 0 5px 5px;
+            border-left-color: #ccc;
+            margin-top: 5px;
+            margin-right: -10px;
+        }
+
+        .dropdown-submenu:hover > a:after {
+            border-left-color: #fff;
+        }
+
+        .dropdown-submenu.pull-left {
+            float: none;
+        }
+
+        .dropdown-submenu.pull-left > .dropdown-menu {
+            left: -100%;
+            margin-left: 10px;
+            -webkit-border-radius: 6px 0 6px 6px;
+            -moz-border-radius: 6px 0 6px 6px;
+            border-radius: 6px 0 6px 6px;
+        }
+    </style>
+
+</head>
+<body>
+<!-- 导航条 -->
+<div id="nav"></div>
+
+
+
+
+<div id="nav-bottom">
+    <!--顶部-->
+    <div class="nav-top">
+        <!--头部-->
+        <div class="header">
+            <div class="py-container">
+                <div class="yui3-g NavList">
+                    <div class="yui3-u Left all-sort">
+                        <h4>全部商品分类</h4>
+                    </div>
+                    <div class="yui3-u Center navArea">
+                        <ul class="nav">
+                            <li class="f-item">服装城</li>
+                            <li class="f-item">美妆馆</li>
+                            <li class="f-item">品优超市</li>
+                            <li class="f-item">全球购</li>
+                            <li class="f-item">闪购</li>
+                            <li class="f-item">团购</li>
+                            <li class="f-item">有趣</li>
+                        </ul>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--列表-->
+<div class="sort">
+    <div class="py-container">
+        <div class="yui3-g SortList ">
+            <div class="yui3-u Left all-sort-list">
+                <div class="all-sort-list2" id="cateListDiv">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row" >
+        <div class="panel panel panel-info">
+            <div class="panel-heading">商品列表</div>
+            <div class="panel-body" id="showProductRow">
+
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="panel panel panel-info">
+            <div class="panel-heading">热销品牌</div>
+            <div class="panel-body" id="showBrandRow">
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!--商品 展示 模板  -->
+<div id="showProductTemplate" style="display: none;">
+    <div class="col-md-4">
+        <div class="thumbnail">
+            <img src="##img##" alt="..."  style="height: 100px">
+            <div class="caption">
+                <h3>商品名：##productName##</h3>
+                <p>价格：##price##</p>
+                <p><a href="#" class="btn btn-primary" onclick="buyProduct('##productId##')" role="button">购买</a> <a href="#" class="btn btn-default" role="button">收藏</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--品牌 展示 模板  -->
+<div id="showBrandTemplate" style="display: none;">
+    <div class="col-md-4">
+        <div class="thumbnail">
+            <img src="##img##" alt="..."  style="height: 100px">
+            <div class="caption">
+                <h3>品牌名：##brandName##</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/DataTablesjs/jquery.dataTables.min.js"></script>
+<script src="js/DataTablesjs/dataTables.bootstrap.min.js"></script>
+<script src="js/bootstrap-3.3.7-distjs/bootstrap.min.js"></script>
+<script src="js/botbox/bootbox.min.js"></script>
+<script src="js/botbox/bootbox.locales.min.js"></script>
+<script src="js/bootstrap-datetimepickerjs/moment-with-locales.js"></script>
+<script src="js/bootstrap-datetimepickerjs/bootstrap-datetimepicker.min.js"></script>
+<script src="js/fileinput5js/fileinput.js"></script>
+<script src="js/fileinput5js/locales/zh.js"></script>
+<script src="js/bootstrap-select-1.12.4js/bootstrap-select.js"></script>
+<script src="js/bootstrap-select-1.12.4js/i18n/defaults-zh_CN.js"></script>
+<script src="js/ztreejs/jquery.ztree.all.min.js"></script>
+<script src="js/jquery.cookie.min.js"></script>
+<script src="js/nav.js"></script>
+<script>
+    $(function(){
+        getProductList();
+        getBrandList();
+        getClassList();
+    })
+
+    function getClassList(){
+        $.ajax({
+            url:"http://localhost:8087/class/getClassList",
+            type:"post",
+            data:{},
+            success:function(result){
+                if(result.code == 200){
+
+                    var v_dataArr = result.data;
+                    var v_html = "";
+                    for(var i = 0 ; i < v_dataArr.length ; i ++){
+                        if(v_dataArr[i].pid ==0 ){
+                            v_html += '<div class="item">' +
+                                        '<h3><a href="#">'+v_dataArr[i].name+'</a></h3>';
+                            v_html += '<div class="item-list clearfix">\n' +
+                                '<div class="subitem">';
+                            for(var j = 0; j < v_dataArr.length ; j++){
+                                if(v_dataArr[j].pid == v_dataArr[i].id){
+                                    var count = 0;
+                                    v_html += ' <dl class="fore'+(count+1)+'">\n' +
+                                        '<dt><a href="#">'+v_dataArr[j].name+'</a></dt><dd>';
+                                    for(var h =0 ; h < v_dataArr.length; h++){
+                                        if(v_dataArr[h].pid == v_dataArr[j].id){
+                                            v_html +='<em><a href="#">'+v_dataArr[h].name+'</a></em>';
+                                        }
+
+                                    }
+
+                                    v_html +='</dd></dl>';
+                                }
+
+                            }
+
+                            v_html +='</div></div></div>'
+                        }
+                    }
+
+                    $("#cateListDiv").html(v_html);
+                    initCss();
+                }
+            }
+
+        })
+
+    }
+    function initCss() {
+        $('.all-sort-list2 > .item').hover(function() {
+            //父类分类列表容器的高度
+
+            $(this).addClass('hover');
+            $(this).children('.item-list').css('display', 'block');
+        }, function() {
+            $(this).removeClass('hover');
+            $(this).children('.item-list').css('display', 'none');
+        });
+
+        $('.item > .item-list > .close').click(function() {
+            $(this).parent().parent().removeClass('hover');
+            $(this).parent().hide();
+        });
+    }
+
+    //获取所有商品数据
+    function getProductList(){
+
+        $.ajax({
+            url:"http://localhost:8087/product/findList",
+            type:"post",
+            success:function(result){
+                if(result.code == 200){
+                    var v_productList = result.data;
+                    var str = "";
+                    var strHtml = $("#showProductTemplate").html();
+                    for(var i =0 ; i < v_productList.length ; i++){
+                    var   v_product =   v_productList[i];
+                        str += strHtml.replace(/##productName##/g,v_product.productName)
+                                        .replace(/##price##/g,v_product.price)
+                                        .replace(/##img##/g,v_product.imgURL)
+                                        .replace(/##productId##/g,v_product.id);
+                    }
+                    $("#showProductRow").html(str);
+                }
+            },
+        });
+
+    }
+    //获取热销品牌
+    function getBrandList(){
+        $.ajax({
+            url:"http://localhost:8087/brand/findBrandList",
+            type:"post",
+            async:true,
+            success:function(result){
+                if(result.code == 200){
+                    var v_brandList = result.data;
+                    var strHtml = $("#showBrandTemplate").html();
+                    for(var i =0 ; i < v_brandList.length ; i++){
+                        var   v_brand =   v_brandList[i];
+                       var  str = strHtml.replace(/##brandName##/g,v_brand.brandName)
+                            .replace(/##img##/g,v_brand.imgURL);
+                        $("#showBrandRow").append(str);
+                    }
+
+                }
+            },
+        });
+    }
+
+
+</script>
+
+
+
+</body>
+</html>
