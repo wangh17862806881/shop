@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.Resource.IResourceMapper">
+<!-- 查询所有资源 菜单 -->
+    <select id="findAllResourceList" resultType="com.fh.shop.admin.po.Resource.Resource">
+        select id,menuName,fatherId,type,url from t_resource
+    </select>
+
+<!-- 新增 -->
+    <insert id="addResource" >
+      <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+          select last_insert_id()
+      </selectKey>
+        insert into t_resource(menuName,fatherId,type,url) values(#{menuName},#{fatherId},#{type},#{url})
+    </insert>
+
+<!-- 删除 多个  -->
+    <delete id="deleteResource">
+        delete from t_resource  where id in
+        <foreach collection="array" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
+
+    </delete>
+
+<!-- 修改 -->
+    <update id="updateResource" >
+        update t_resource set menuName = #{menuName},url=#{url},type=#{type} where id =#{id}
+    </update>
+
+
+<!-- 查询用户对应权限   导航条-->
+<select id="findAllResourceByUserId" resultType="com.fh.shop.admin.po.Resource.Resource">
+    select trsou.menuName,trsou.url,trsou.id,trsou.fatherId from
+    t_resource trsou left join t_role_resource trore on trsou.id = trore.resourceid
+    left join t_user_role tur on tur.roleid = trore.roleid
+    where tur.userId = #{id} and trsou.type = 1 group by trsou.menuName,trsou.url
+</select>
+
+<!-- 查询用户对应权限   -->
+<select id="findUserResourceUrlByUserId" resultType="java.lang.String">
+    select trsou.url from
+    t_resource trsou left join t_role_resource trore on trsou.id = trore.resourceid
+    left join t_user_role tur on tur.roleid = trore.roleid
+    where tur.userId = #{id}  group by trsou.menuName,trsou.url
+</select>
+
+
+
+</mapper>

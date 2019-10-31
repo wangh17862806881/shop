@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.product.IProductMapper">
+<!-- 查询条件 -->
+    <sql id="findCondi">
+        <where>
+            <if test="beginTime != null ">
+
+                productDate &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null ">
+
+                and #{endTime} &gt;= productDate
+            </if>
+            <if test="beginPrice != null and beginPrice > 0">
+                <![CDATA[  and price >= #{beginPrice} ]]>
+            </if>
+            <if test="endPrice != null and endPrice !=''">
+                <![CDATA[  and  #{endPrice} >= price ]]>
+            </if>
+
+            <if test="productName != null and productName !=''">
+                and productName like  CONCAT('%',#{productName},'%')
+            </if>
+            <if test="brandId != null and  brandId > 0 ">
+               and  brandId = #{brandId}
+            </if>
+            <if test="classId1 != null and  classId1 >0 ">
+               and  classId1 =#{classId1}
+            </if>
+            <if test="classId2 != null and  classId2 >0 ">
+               and  classId2 =#{classId2}
+            </if>
+            <if test="classId3 != null and  classId3 >0 ">
+               and  classId3 =#{classId3}
+            </if>
+        </where>
+    </sql>
+
+
+<!-- 查询总条数 -->
+    <select id="findTotalCount" resultType="java.lang.Long">
+        select count(*) from t_product tp left join t_brand tb on tp.brandId = tb.id
+        <include refid="findCondi"/>
+    </select>
+
+<!-- 新增商品 -->
+    <insert id="addProduct" >
+        insert into t_product(productName,price,imgURL,productDate,brandId,classId1,classId2,classId3)
+        values(#{productName},#{price},#{imgURL},#{productDate},#{brandId},#{classId1},#{classId2},#{classId3})
+    </insert>
+
+<!-- 回显 -->
+    <select id="findProductById" resultType="com.fh.shop.admin.po.product.Product">
+        select tp.id,productName,price,imgURL,productDate,brandId,
+         concat(c1.name,'-->',c2.name,'-->',c3.name) "categoryName"
+         from t_product tp
+         left join t_class_po c1 on tp.classId1 = c1.id
+        left join t_class_po c2 on tp.classId2 = c2.id
+        left join t_class_po c3 on tp.classId3 = c3.id
+         where tp.id = #{id}
+    </select>
+
+<!-- 单个删除 通过id -->
+    <delete id="deleteProductById" >
+        delete from t_product where id = #{id}
+    </delete>
+
+
+<!-- 修改 -->
+    <update id="updateProductById" parameterType="com.fh.shop.admin.po.product.Product">
+        update t_product
+        <set>
+            <if test="productName != null and  productName != '' ">
+                productName = #{productName},
+            </if>
+            <if test="price != null and  price > 0 ">
+                price = #{price},
+            </if>
+            <if test="imgURL != null and  imgURL != '' ">
+                imgURL = #{imgURL},
+            </if>
+            <if test="productDate != null ">
+                productDate = #{productDate},
+            </if>
+            <if test="brandId != null and  brandId > 0 ">
+                brandId = #{brandId},
+            </if>
+            <if test="classId1 != null and  classId1 >0 ">
+                classId1 = #{classId1},
+            </if>
+            <if test="classId2 != null and  classId2 >0 ">
+                classId2 = #{classId2},
+            </if>
+            <if test="classId3 != null and  classId3 >0 ">
+                classId3 = #{classId3}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+<!-- 条件查询 查询所有  分页 -->
+    <select id="findALLProduct" resultType="com.fh.shop.admin.po.product.Product">
+      select allData.* from (
+        select tp.id,productName,price,tp.imgURL,productDate,tp.popular,tb.brandName "brandName",
+        concat(c1.name,'-->',c2.name,'-->',c3.name) "categoryName"
+        from t_product tp left join t_brand tb on tp.brandId = tb.id
+        left join t_class_po c1 on tp.classId1 = c1.id
+        left join t_class_po c2 on tp.classId2 = c2.id
+        left join t_class_po c3 on tp.classId3 = c3.id
+        <include refid="findCondi"/>
+          order by tp.id desc
+          ) allData
+        limit #{start},#{length}
+    </select>
+    <!-- 条件查询 查询所有  不分页 excel -->
+    <select id="findALLProductNoCondi" resultType="com.fh.shop.admin.po.product.Product">
+      select allData.* from (
+        select tp.id,productName,price,tp.imgURL,productDate,tp.popular,tb.brandName "brandName",
+        concat(c1.name,'-->',c2.name,'-->',c3.name) "categoryName"
+        from t_product tp left join t_brand tb on tp.brandId = tb.id
+        left join t_class_po c1 on tp.classId1 = c1.id
+        left join t_class_po c2 on tp.classId2 = c2.id
+        left join t_class_po c3 on tp.classId3 = c3.id
+        <include refid="findCondi"/>
+          order by tp.id desc
+          ) allData
+
+    </select>
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.member.IMemberMapper">
+
+<sql id="findCondi">
+	<where>
+		<if test="beginTime != null ">
+
+			birthday &gt;= #{beginTime}
+		</if>
+		<if test="endTime != null">
+
+			and #{endTime} &lt;= birthday
+		</if>
+		<if test="areaId1 != null and areaId1 > 0">
+			and areaId1 = #{areaId1}
+		</if>
+		<if test="areaId2 != null and areaId2 > 0">
+			and areaId2 = #{areaId2}
+		</if>
+		<if test="areaId3 != null and areaId3 > 0">
+			and areaId3 = #{areaId3}
+		</if>
+
+
+		<if test="realName != null and realName !=''">
+			and realName like  CONCAT('%',#{realName},'%')
+		</if>
+		<if test="userName != null and userName !=''">
+			and userName like  CONCAT('%',#{userName},'%')
+		</if>
+
+
+
+	</where>
+
+</sql>
+
+
+
+
+<!-- 查询所有用户列表分页 -->
+	<select id="findPageList" resultType="com.fh.shop.admin.po.member.Member">
+		 select u.* from (select tu.id,userName,realName,password,phone,email,birthday,
+		concat(ta1.name,'-->',ta2.name,'-->',ta3.name) "areaName",areaId1,areaId2,areaId3
+		from t_member tu
+		left join t_area ta1 on tu.areaId1 = ta1.id
+		left join t_area ta2 on tu.areaId2 = ta2.id
+		left join t_area ta3 on tu.areaId3 = ta3.id
+		<include refid="findCondi"/>
+		 order by tu.id desc) u
+		limit #{start},#{length}
+	</select>
+<!-- 查询总条数 -->
+	<select id="findTotalCount" resultType="long">
+		select count(*) from t_member tu
+		<include refid="findCondi"/>
+	</select>
+
+
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.role.IRoleMapper">
+
+<!-- 查询总条数 -->
+<select id="totalcount" resultType="long">
+    select count(*) from t_role
+</select>
+
+<!-- 查询角色对应权限 名 -->
+    <select id="findResourcemenuNameByRoleId" resultType="java.lang.String">
+        select menuName from t_resource tr  left join  t_role_resource trr on trr.resourceid = tr.id
+        where roleid = #{id}
+    </select>
+
+<!-- 查询所有数据 -->
+    <select id="getRoleList" resultType="com.fh.shop.admin.po.role.Role">
+        select r.* from (
+        select id,roleName from t_role order by id desc
+        ) r limit #{start},#{length}
+    </select>
+
+<!-- 回显 -->
+    <select id="findRoleById" resultType="com.fh.shop.admin.po.role.Role">
+        select id,roleName from t_role where id = #{id}
+    </select>
+
+<!--  修改 -->
+    <update id="updateRoleById">
+        update t_role
+        <set>
+            <if test="roleName != null and roleName !=''">
+                roleName = #{roleName}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+<!-- 新增 -->
+    <insert id="addRole" >
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_role(roleName) values(#{roleName})
+    </insert>
+
+<!-- 删除角色对应中间 -->
+    <delete id="deleteRole_ResourceByRoleId">
+        delete from t_role_resource where roleId = #{id}
+    </delete>
+
+<!-- 查询 角色 对应 资源菜单 id 集合-->
+    <select id="findRole_ResourceByid" resultType="java.lang.Long">
+        select resourceId from t_role_resource where roleId = #{id}
+    </select>
+<!-- 新增 中间表 -->
+    <insert id="addRole_Resource" >
+        insert into t_role_resource(roleId,resourceId) values
+        <foreach collection="list" separator="," item="role_resource">
+            (#{role_resource.roleId},#{role_resource.resourceId})
+        </foreach>
+
+    </insert>
+
+<!--  单个删除 -->
+    <delete id="deleteRoleById">
+        delete from t_role where id = #{id}
+    </delete>
+
+</mapper>

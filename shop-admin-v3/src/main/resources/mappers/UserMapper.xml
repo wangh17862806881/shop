@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.user.IUserMapper">
+
+<sql id="findCondi">
+	<where>
+		<if test="beginTime != null">
+
+			entryTime &gt;= #{beginTime}
+		</if>
+		<if test="areaId1 != null and areaId1 > 0">
+			and areaId1 = #{areaId1}
+		</if>
+		<if test="areaId2 != null and areaId2 > 0">
+			and areaId2 = #{areaId2}
+		</if>
+		<if test="areaId3 != null and areaId3 > 0">
+			and areaId3 = #{areaId3}
+		</if>
+		<if test="endTime != null ">
+
+			and #{endTime} &lt;= entryTime
+		</if>
+		<if test="beginAge != null and beginAge > 0">
+			<![CDATA[  and age >= #{beginAge} ]]>
+		</if>
+		<if test="endAge != null and endAge !=''">
+			<![CDATA[  and  #{endAge} >= age ]]>
+		</if>
+		<if test="beginSalary != null and beginSalary > 0">
+			<![CDATA[ and   salary >= #{beginSalary} ]]>
+		</if>
+		<if test="endSalary != null and endSalary !=''">
+			<![CDATA[  and  #{endSalary} >= salary ]]>
+		</if>
+		<if test="userName != null and userName !=''">
+			and userName like  CONCAT('%',#{userName},'%')
+		</if>
+		<if test="realName != null and realName !=''">
+			and realName like  CONCAT('%',#{realName},'%')
+		</if>
+		<if test="roleidarr !=null and  roleidarr.length >0  ">
+			and tu.id in
+			(select  userid  from t_user_role where roleid in
+			<foreach collection="roleidarr" open="(" close=")" separator="," item="roleidarr">
+				#{roleidarr}
+			</foreach>
+			group by userid having count(*) = #{roleidarrcount}
+			)
+		</if>
+
+	</where>
+
+</sql>
+
+<sql id="findCondiexcel">
+		<where>
+			<if test="beginTime != null and beginTime !=''">
+
+				entryTime &gt;= #{beginTime}
+			</if>
+			<if test="areaId1 != null and areaId1 > 0">
+				and areaId1 = #{areaId1}
+			</if>
+			<if test="areaId2 != null and areaId2 > 0">
+				and areaId2 = #{areaId2}
+			</if>
+			<if test="areaId3 != null and areaId3 > 0">
+				and areaId3 = #{areaId3}
+			</if>
+			<if test="endTime != null and endTime !=''">
+
+				and #{endTime} &lt;= entryTime
+			</if>
+			<if test="beginAge != null and beginAge > 0">
+				<![CDATA[  and age >= #{beginAge} ]]>
+			</if>
+			<if test="endAge != null and endAge !=''">
+				<![CDATA[  and  #{endAge} >= age ]]>
+			</if>
+			<if test="beginSalary != null and beginSalary > 0">
+				<![CDATA[ and   salary >= #{beginSalary} ]]>
+			</if>
+			<if test="endSalary != null and endSalary !=''">
+				<![CDATA[  and  #{endSalary} >= salary ]]>
+			</if>
+			<if test="userName != null and userName !=''">
+				and userName like  CONCAT('%',#{userName},'%')
+			</if>
+			<if test="realName != null and realName !=''">
+				and realName like  CONCAT('%',#{realName},'%')
+			</if>
+			<if test="roleidarr !=null and  roleidarr.length >0 and roleidarrcount != null and roleidarrcount > 0 ">
+				and tu.id in
+				(select  userid  from t_user_role where roleid in
+				<foreach collection="roleidarr" open="(" close=")" separator="," item="roleidarr">
+					#{roleidarr}
+				</foreach>
+				group by userid having count(*) = #{roleidarrcount}
+				)
+			</if>
+
+		</where>
+
+	</sql>
+
+<!-- 查询用户对应的角色名 -->
+	<select id="findRoleName" parameterType="long"  resultType="java.lang.String">
+		select tr.roleName from t_user_role tur left join t_role tr on tur.roleid = tr.id
+		 where tur.userid = #{id}
+	</select>
+
+<!-- 查询所有角色 -->
+	<select id="findroleall" resultType="com.fh.shop.admin.po.role.Role">
+		select id,roleName from t_role
+	</select>
+
+<!-- 修改方法 -->
+	<update id="updateUserById" parameterType="com.fh.shop.admin.po.user.User">
+		update t_user set
+		userName = #{userName},realName = #{realName},
+		<if test="password != null and password != ''">
+			password = #{password},
+		</if>
+		<if test="areaId1 != null and areaId1 > 0">
+			areaId1 = #{areaId1},
+		</if>
+		<if test="areaId2 != null and areaId2 > 0">
+			areaId2 = #{areaId2},
+		</if>
+		<if test="areaId3 != null and areaId3 > 0">
+			areaId3 = #{areaId3},
+		</if>
+		salary = #{salary},entryTime = #{entryTime},
+		sex = #{sex},age = #{age},phone = #{phone},email = #{email},imgURL = #{imgURL}
+		where id = #{id}
+	</update>
+
+<!-- 新增用户对应角色 -->
+	<insert id="addRole" parameterType="com.fh.shop.admin.po.user.User_Role">
+		insert into t_user_role(userid,roleid)
+		values(#{userId},#{roleId})
+	</insert>
+
+<!-- 根据用户id 删除 中间表对应 角色id -->
+	<delete id="deleteRoleIdByUserId">
+		delete from t_user_role where userid = #{id}
+	</delete>
+
+
+<!-- 根据用户id查询角色id -->
+	<select id="findRoleIdByUserId" resultType="java.lang.Integer">
+		select roleid from t_user_role where userid = #{id}
+	</select>
+
+<!-- 新增用户方法 -->
+	<insert id="addUser" parameterType="com.fh.shop.admin.po.user.User">
+<selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+	select last_insert_id()
+</selectKey>
+		insert  t_User (username,realname,salt,password,sex,age,phone,email,salary,entryTime,imgURL,areaId1,areaId2,areaId3)
+		values (#{userName},#{realName},#{salt},#{password},#{sex},#{age},#{phone},#{email},#{salary},#{entryTime},#{imgURL},#{areaId1},#{areaId2},#{areaId3})
+	</insert>
+
+<!--  回显  回填   通过id-->
+<select id="findUserById" parameterType="long" resultType="com.fh.shop.admin.po.user.User">
+select tu.id,username,realname,password,sex,age,phone,email,salary,entryTime,imgURL,loginErrorCount,salt,
+concat(ta1.name,'-->',ta2.name,'-->',ta3.name) "areaNames",areaId1,areaId2,areaId3
+		from t_user tu
+		left join t_area ta1 on tu.areaId1 = ta1.id
+		left join t_area ta2 on tu.areaId2 = ta2.id
+		left join t_area ta3 on tu.areaId3 = ta3.id
+where
+tu.id = #{id}
+</select>
+
+
+
+<!-- 通过用户id集合删除对应中间表 -->
+	<delete id="deletebBatchUser_RoleByUserIdList">
+		delete from t_user_role where userid in
+		<foreach collection="list" separator="," open="(" close=")" item="id">
+			#{id}
+		</foreach>
+	</delete>
+
+<!-- 批量删除 -->
+	<delete id="deletebatchids">
+		delete from t_user where id in
+		<foreach collection="list" item="id" separator="," open="(" close=")">
+				#{id}
+		</foreach>
+	</delete>
+
+
+<!-- 单个删除方法 -->
+	<delete id="deleteUserById" parameterType="java.lang.Long">
+		delete from t_user where id = #{id}
+	</delete>
+
+<!-- 查询所有用户列表分页 -->
+	<select id="findPageList" resultType="com.fh.shop.admin.po.user.User">
+		 select u.* from (select tu.id,userName,realName,password,sex,age,phone,email,salary,entryTime,imgURL,loginErrorCount,salt,
+		concat(ta1.name,'-->',ta2.name,'-->',ta3.name) "areaNames",areaId1,areaId2,areaId3
+		from t_user tu
+		left join t_area ta1 on tu.areaId1 = ta1.id
+		left join t_area ta2 on tu.areaId2 = ta2.id
+		left join t_area ta3 on tu.areaId3 = ta3.id
+		<include refid="findCondi"/>
+		 order by tu.id desc) u
+		limit #{start},#{length}
+	</select>
+<!-- 查询总条数 -->
+	<select id="findTotalCount" resultType="long">
+		select count(*) from t_user tu
+		<include refid="findCondi"/>
+	</select>
+
+<!--  把成功登陆更新后的信息同步到数据库  -->
+	<update id="updateUserLoginData">
+		update t_user set loginCount = #{loginCount},loginDate = now(),loginErrorCount = 0 where id = #{id}
+	</update>
+
+<!-- 更新登陆错误信息 -->
+	<update id="updateLoginErrorData">
+		update t_user set loginErrorCount = #{loginErrorCount},loginErrorDate = now()  where id = #{id}
+	</update>
+<!-- 更新用户锁定状态 -->
+	<update id="updateStatus">
+		update t_user set loginErrorCount = 0 where id = #{id}
+	</update>
+
+<!-- 修改用户密码 -->
+	<update id="updatePasswordById">
+		update t_user set password = #{password} where id = #{id}
+	</update>
+
+<!--  登陆验证  -->
+	<select id="loginCheck" resultType="com.fh.shop.admin.po.user.User">
+		select tu.id,userName,realName,password,sex,age,phone,email,salary,entryTime,imgURL,loginCount,loginDate,salt,loginErrorDate,loginErrorCount
+		from t_user tu where userName = #{userName}
+	</select>
+<!-- excel 导出 不分页 条件查询 -->
+	<select id="findPageListNoCondi" resultType="com.fh.shop.admin.po.user.User">
+		select u.* from (select tu.id,userName,realName,password,sex,age,phone,email,salary,entryTime,imgURL,loginErrorCount,salt,
+		concat(ta1.name,'-->',ta2.name,'-->',ta3.name) "areaNames",areaId1,areaId2,areaId3
+		from t_user tu
+		left join t_area ta1 on tu.areaId1 = ta1.id
+		left join t_area ta2 on tu.areaId2 = ta2.id
+		left join t_area ta3 on tu.areaId3 = ta3.id
+		<include refid="findCondi"/>
+		order by tu.id desc) u
+
+	</select>
+
+</mapper>

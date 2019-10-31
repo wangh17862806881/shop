@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <!--  除了springMVC其余所有spring配置文件都要用contextloaderlistener加载  -->
+  <!-- 所有配置文件想要使用 必须要加载  -->
+  <!-- classpath: 相当于source类型的文件夹   后面的路径可变 但必须与配置文件保持一致  -->
+  <!-- 通过contextLoaderListener来加载spring的配置文件 -->
+  <!--   -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+      classpath:spring/spring-common.xml
+    </param-value>
+  </context-param>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!-- 处理中文乱码 -->
+  <!-- 后缀名必须保持一致  方便拦截所有请求对传的值进行过滤  防止乱码  -->
+  <filter>
+    <filter-name>v</filter-name>
+    <filter-class>
+      org.springframework.web.filter.CharacterEncodingFilter
+    </filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>utf-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>false</param-value>
+    </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>v</filter-name>
+    <url-pattern>*.jhtml</url-pattern>
+  </filter-mapping>
+
+  <!-- springMVC的前端总控制器 DispatcherServlet-->
+  <!--  后缀名随便定义  发送请求时必须后缀名和配置的保持一致  -->
+  <servlet>
+    <servlet-name>w</servlet-name>
+    <servlet-class>
+      org.springframework.web.servlet.DispatcherServlet
+    </servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>
+        classpath:spring/spring-mvc-controller.xml
+      </param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>w</servlet-name>
+    <url-pattern>*.jhtml</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>login.jsp</welcome-file>
+  </welcome-file-list>
+
+
+<!--  图片验证码  -->
+  <servlet>
+    <servlet-name>imgCode</servlet-name>
+    <servlet-class>com.fh.shop.admin.common.ImageCodeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>imgCode</servlet-name>
+    <url-pattern>/imgCode</url-pattern>
+  </servlet-mapping>
+
+
+<!-- 配置自定义过滤器 -->
+  <filter>
+    <filter-name>log</filter-name>
+    <filter-class>com.fh.shop.admin.common.WebContextFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>log</filter-name>
+    <url-pattern>*.jhtml</url-pattern>
+  </filter-mapping>
+
+</web-app>
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.brand.IBrandMapper">
+
+    <sql id="where">
+        <where>
+            <if test="brandName != null and brandName != ''">
+                  brandName like concat('%',#{brandName},'%')
+            </if>
+        </where>
+    </sql>
+
+<!-- 查询总条数 -->
+    <select id="totalcount" resultType="long">
+        select count(*) from t_brand
+        <include refid="where"></include>
+    </select>
+
+<!--  查询数据集合 -->
+    <select id="getBrandList" parameterType="com.fh.shop.admin.param.brand.BrandSearchParam" resultType="com.fh.shop.admin.po.brand.Brand">
+        select b.* from (
+        select id,sort,brandName,imgURL,popular from t_brand
+        <include refid="where"></include>
+        order by popular desc , sort desc
+        ) b limit #{start},#{length}
+    </select>
+
+<!--  新增数据 -->
+    <insert id="addbrand" >
+        insert into t_brand(brandName,imgURL) values(#{brandName},#{imgURL})
+    </insert>
+
+<!-- 回显 -->
+    <select id="findBrandById" resultType="com.fh.shop.admin.po.brand.Brand">
+        select id,brandName,imgURL,popular from t_brand where id = #{id}
+    </select>
+
+<!-- 修改品牌 -->
+    <update id="updateBrandById" parameterType="com.fh.shop.admin.po.brand.Brand">
+        update t_brand
+        <set>
+            <if test="brandName != null and brandName != ''">
+                brandName = #{brandName},
+            </if>
+            <if test="imgURL != null and imgURL != ''">
+                imgURL = #{imgURL}
+            </if>
+            <if test="popular != null ">
+                popular = #{popular}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!-- 删除 单个 -->
+    <delete id="deleteBrandById" >
+        delete from t_brand where id = #{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.log.ILogMapper">
+
+    <sql id="findCondi">
+        <where>
+            <if test="beginTime != null ">
+
+                currentDate &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+
+                and #{endTime} &lt;= currentDate
+            </if>
+
+            <if test="userName != null and userName !=''">
+                and userName like  CONCAT('%',#{userName},'%')
+            </if>
+            <if test="realName != null and realName !=''">
+                and realName like  CONCAT('%',#{realName},'%')
+            </if>
+            <if test="info != null and info !=''">
+                and info like  CONCAT('%',#{info},'%')
+            </if>
+            <if test="status != null ">
+                and status =#{status}
+            </if>
+        </where>
+
+    </sql>
+
+    <!-- 查询条数 -->
+    <select id="findCount" resultType="java.lang.Long">
+        select count(*) from t_log
+        <include refid="findCondi"/>
+    </select>
+    <!-- 查询对当前页数据 -->
+    <select id="findPageData" resultType="com.fh.shop.admin.po.log.LogInfo">
+    select l.* from (
+    select id,userName,realName,info,status,errorMsg,detail,currentDate,content from t_log
+    <include refid="findCondi"/>
+    order by id desc
+    limit #{start},#{length}
+    ) l
+    </select>
+<!-- 新增方法 -->
+    <insert id="add" parameterType="com.fh.shop.admin.po.log.LogInfo">
+         insert into t_log (userName,realName,status,errorMsg,info,currentDate,content,detail)
+        values(#{userName},#{realName},#{status},#{errorMsg},#{info},#{currentDate},#{content},#{detail})
+    </insert>
+</mapper>

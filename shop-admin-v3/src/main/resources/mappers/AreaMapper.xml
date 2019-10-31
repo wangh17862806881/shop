@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.admin.mapper.area.IAreaMapper">
+
+<select id="findAllArea" resultType="java.util.Map">
+select id,name,pid pId from t_area
+</select>
+<!-- 新增 -->
+    <insert id="addArea" parameterType="com.fh.shop.admin.po.area.Area">
+    <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id"   >
+        select last_insert_id()
+    </selectKey>
+      insert into t_area(pid,name) values(#{pid},#{name})
+    </insert>
+
+<!-- 修改 -->
+    <update id="updateAreaByid" parameterType="com.fh.shop.admin.po.area.Area">
+        update t_area set name = #{name} where id = #{id}
+    </update>
+
+<!--  删除 通过id -->
+    <delete id="deleteAreaById" >
+        delete from t_area where id in
+        <foreach collection="array" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+
+    </delete>
+</mapper>
