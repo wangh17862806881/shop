@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC  
+    "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- namespace指向对应的mapper接口 此配置文件就相当于usermapper接口的实现类 -->
+<mapper namespace="com.fh.shop.api.product.mapper.IProductMappers">
+
+
+	<update id="updateProduct" >
+	update t_product set stock = stock - #{count} where id = #{id} and stock >= #{count}
+</update>
+
+
+</mapper>
+
+
+
+
+
